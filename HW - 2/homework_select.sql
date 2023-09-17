@@ -39,6 +39,7 @@ WHERE StockItemName LIKE '%urgent%' OR StockItemName LIKE 'Animal%'
 SELECT DISTINCT ps.SupplierID, ps.SupplierName
 FROM Purchasing.Suppliers AS ps
     INNER JOIN Purchasing.PurchaseOrders AS ppo ON ps.SupplierID = ppo.SupplierID
+WHERE ppo.IsOrderFinalized = 0
 
 /*
 3. Заказы (Orders) с ценой товара (UnitPrice) более 100$ 
@@ -61,19 +62,20 @@ FROM Purchasing.Suppliers AS ps
 
 -- Постраничная выборка
 DECLARE
-    @pagesize BIGINT = 10, -- размер страницы
-    @pagenum BIGINT = 1; -- номер страницы
+    @pagesize BIGINT = 100, -- размер страницы
+    @pagenum BIGINT = 1; -- номер страницы 
 
 SELECT DISTINCT SO.OrderID
     , FORMAT(SO.OrderDate, 'dd.MM.yyyy') AS OrderDate
     , MONTH(OrderDate) as 'OrderDate(Month)'
     , DATEPART(QUARTER, OrderDate) AS 'OrderDate(Quarter)'
-    -- DATEPART()
+    , convert(smallint, (datepart(month, so.OrderDate) - 1) / 4 + 1) AS [trimester]
     , CustomerName AS Customer
 FROM Sales.Orders AS SO
     INNER JOIN Sales.OrderLines AS SOL ON SO.OrderID = SOL.OrderID
-    INNER JOIN Sales.Customers AS SC ON SO.OrderID = SC.CustomerID
-ORDER BY [OrderDate(Quarter)] ASC, OrderDate ASC
+    INNER JOIN Sales.Customers AS SC ON SO.CustomerID = SC.CustomerID
+WHERE (SOL.UnitPrice > 100 OR SOL.Quantity > 20) AND SOL.PickingCompletedWhen IS NOT NULL
+ORDER BY [OrderDate(Quarter)] ASC, trimester ASC, OrderDate ASC
     OFFSET (@pagenum - 1) * @pagesize ROWS
     FETCH NEXT @pagesize ROWS ONLY
 
