@@ -36,10 +36,12 @@ WHERE StockItemName LIKE '%urgent%' OR StockItemName LIKE 'Animal%'
 По каким колонкам делать JOIN подумайте самостоятельно.
 */
 
-SELECT DISTINCT ps.SupplierID, ps.SupplierName
-FROM Purchasing.Suppliers AS ps
-    INNER JOIN Purchasing.PurchaseOrders AS ppo ON ps.SupplierID = ppo.SupplierID
-WHERE ppo.IsOrderFinalized = 0
+SELECT TOP 10 PS.SupplierID AS 'ID поставщика'
+    , PS.SupplierName AS 'Наименование поставщика'
+FROM Purchasing.Suppliers AS PS 
+    LEFT JOIN Purchasing.PurchaseOrders AS PPO ON PS.SupplierID = PPO.SupplierID
+WHERE IsOrderFinalized = 0 OR IsOrderFinalized IS NULL
+ORDER BY [ID поставщика] ASC
 
 /*
 3. Заказы (Orders) с ценой товара (UnitPrice) более 100$ 
