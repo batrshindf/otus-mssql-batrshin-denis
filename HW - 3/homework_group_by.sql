@@ -30,16 +30,16 @@ USE WideWorldImporters
 Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
 */
 
-SELECT TOP 10 YEAR(OrderDate)
-    , MONTH(OrderDate)
-    , AVG(SIL.UnitPrice) AS AvgPrice
-    , SUM()
+SELECT YEAR(OrderDate) AS 'Год продажи'
+    , MONTH(OrderDate) AS 'Месяц продажи'
+    , AVG(SIL.UnitPrice) AS 'Средняя цена за месяц по всем товарам'
+    , SUM(ExtendedPrice) AS 'Общая сумма продаж за месяц'
 FROM Sales.Invoices AS SI
     INNER JOIN Sales.Orders AS SO ON SO.OrderID = SI.OrderID
     INNER JOIN Sales.InvoiceLines AS SIL ON SI.InvoiceID = SIL.InvoiceID
 GROUP BY YEAR(SO.OrderDate),
     MONTH(SO.OrderDate)
-
+ORDER BY [Год продажи] ASC, [Месяц продажи] ASC
 
 /*
 2. Отобразить все месяцы, где общая сумма продаж превысила 4 600 000
@@ -52,7 +52,16 @@ GROUP BY YEAR(SO.OrderDate),
 Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
 */
 
-напишите здесь свое решение
+SELECT YEAR(OrderDate) AS 'Год продажи'
+    , MONTH(OrderDate) AS 'Месяц продажи'
+    , SUM(ExtendedPrice) AS 'Общая сумма продаж за месяц'
+FROM Sales.Invoices AS SI
+    INNER JOIN Sales.Orders AS SO ON SO.OrderID = SI.OrderID
+    INNER JOIN Sales.InvoiceLines AS SIL ON SI.InvoiceID = SIL.InvoiceID
+GROUP BY YEAR(SO.OrderDate),
+    MONTH(SO.OrderDate)
+HAVING SUM(ExtendedPrice) > 4600000
+ORDER BY [Год продажи] ASC, [Месяц продажи] ASC
 
 /*
 3. Вывести сумму продаж, дату первой продажи
@@ -71,7 +80,22 @@ GROUP BY YEAR(SO.OrderDate),
 Продажи смотреть в таблице Sales.Invoices и связанных таблицах.
 */
 
-напишите здесь свое решение
+SELECT YEAR(OrderDate) AS 'Год продажи'
+    , MONTH(OrderDate) AS 'Месяц продажи'
+    , [Description] AS 'Наименование товара'
+    , SUM(ExtendedPrice) AS 'Сумма продаж'
+    , MIN(InvoiceDate) AS 'Дата первой продажи'
+    , SUM(Quantity) AS 'Количество проданного'
+FROM Sales.Invoices AS SI
+    INNER JOIN Sales.Orders AS SO ON SO.OrderID = SI.OrderID
+    INNER JOIN Sales.InvoiceLines AS SIL ON SI.InvoiceID = SIL.InvoiceID
+GROUP BY YEAR(OrderDate),
+    MONTH(OrderDate),
+    [Description]
+HAVING SUM(Quantity) < 50
+ORDER BY [Год продажи] ASC
+    , [Месяц продажи] ASC
+    , [Наименование товара] ASC
 
 -- ---------------------------------------------------------------------------
 -- Опционально
