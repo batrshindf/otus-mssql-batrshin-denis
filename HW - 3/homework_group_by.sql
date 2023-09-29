@@ -56,10 +56,10 @@ SELECT YEAR(OrderDate) AS 'Год продажи'
     , MONTH(OrderDate) AS 'Месяц продажи'
     , SUM(ExtendedPrice) AS 'Общая сумма продаж за месяц'
 FROM Sales.Invoices AS SI
-    INNER JOIN Sales.Orders AS SO ON SO.OrderID = SI.OrderID
-    INNER JOIN Sales.InvoiceLines AS SIL ON SI.InvoiceID = SIL.InvoiceID
-GROUP BY YEAR(SO.OrderDate),
-    MONTH(SO.OrderDate)
+    RIGHT JOIN Sales.Orders AS SO ON SO.OrderID = SI.OrderID
+    RIGHT JOIN Sales.InvoiceLines AS SIL ON SI.InvoiceID = SIL.InvoiceID
+GROUP BY YEAR(SO.OrderDate)
+    , MONTH(SO.OrderDate)
 HAVING SUM(ExtendedPrice) > 4600000
 ORDER BY [Год продажи] ASC, [Месяц продажи] ASC
 
